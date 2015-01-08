@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'>
+    <link href='static/css/bootstrap.min.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='static/css/banner.css' rel='stylesheet' type='text/css'>
+    <link href='static/css/index.css' rel='stylesheet' type='text/css'>
+
+    <script src="static/js/jquery.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <title>Matt-Burger</title>
+  </head>
+
+  <body>
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+      RectiFly Controls
+    </button>
+
+    <div class="collapse" id="collapseExample">
+      <div class="well margin-bottom-0">
+        <form role="form" id="order_form" method="post" onSubmit="return generateUrl();" action="">
+          <div class="row">
+            <div class="form-group col-md-2">
+              <h4>Camera Model:</h4>
+              <select name="camera_model" class="form-control">
+                <option value="">Unspecified</option>
+                <option value="Dec2014">Dec2014</option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-2">
+              <h4>File Type:</h4>
+              <select id="filetype" name="filetype" class="form-control skipdata">
+                <option value="jpg">jpg</option>
+                <option value="tif">tif</option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-2">
+              <h4>Nominal:</h4>
+              <select name="nominal" class="form-control">
+                <option value="oct2014">Oct-2014</option>
+                <option value="original">Original</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-2">
+              <h4>Flat Fielding:</h4>
+              <select name="flat_field" class="form-control">
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-2">
+              <h4>Curve:</h4>
+              <select name="curve" class="form-control">
+                <option value="Oct2014.acv">Oct2014.acv</option>
+                <option value="Original.acv">Original.acv</option>
+                <option value="gamma22.acv">gamma22.acv</option>
+                <option value="gamma45.acv">gamma45.acv</option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-2">
+              <h4>Bit Depth:</h4>
+              <select name="output_bits" class="form-control">
+                <option value="8">8</option>
+                <option value="12">12</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group col-md-3">
+            </div>
+
+            <div class="form-group col-md-3">
+              <h4>Image Width (pixels)(-1 for full size):</h4>
+              <input type="number" class="form-control" name="width" min="-1" max="4000" value="1000"><br>
+            </div>
+
+            <div class="form-group col-md-3">
+              <h4>Image Sharpness:</h4>
+              <input type="range" class="width100" name="unsharp" min="0" max="1" step="0.1" value="0"
+              onchange="updateUnsharp(this.value)">
+              <span id="unsharpValue">0</span>
+            </div>
+          </div>
+          <div class="row center">
+            <button type="submit" class="button btn btn-primary btn-lg active" id="generate">Generate Image</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+      <div class='navbar-inner'>
+        <div class='container'>
+          <div class='navbar-header'>
+            <a class='navbar-brand' href='/'>
+            <h1>RectiFly</h1>
+            </a>
+          </div>
+          <div id='inner-container'>
+            <ul id="nav-buttons" class='nav navbar-nav'>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </header>
+    <div class="container-fluid">
+      <div id="image-area" class="col-md-10">
+        <img src="" id="image" class="center">
+      </div>
+    </div>
+
+  </body>
+</html>
+
+<script type='text/javascript'>
+   function updateUnsharp(newValue) {
+     document.getElementById("unsharpValue").innerHTML=newValue;
+   }
+
+// Scene will need to be extracted from template
+   var input_scene = 1234
+
+   function generateUrl(){
+     // var scene = $("#scene").val();
+     // var input_scene = scene.replace(".tif", "");
+     url = "/image/" + input_scene + "." + $('#filetype option:selected').val() + "?" + $("#order_form :not(.skipdata)").serialize();
+    console.log(url);
+    return url;
+   }
+
+   $("#order_form").on("submit", function(e){
+     e.preventDefault();
+
+     var format = $('input[name="filetype"]').val();
+     if (format ===  "tif") {
+       window.open(generateUrl(), '_blank');
+     }
+     else {
+       $("#generate").text("Loading Image...")
+         .css("background-color", "red")
+         .attr("disabled", "disabled");
+       $("#image").attr('src', generateUrl());
+       $("#image").load(function(){
+         $("#generate").text("Generate Image")
+         .removeAttr("style")
+         .removeAttr("disabled");
+       });
+     }
+   });
+</script>
